@@ -1,256 +1,156 @@
 <template>
-    <div class="bg">
-        <div class="game" v-if="counter !== 0">
-            <div class="timer">
-                Осталось: {{ counter }}
-            </div>
-            <div class="score-info">
-                Ваш счет: {{ currScore }}
-            </div>
-            <div class="objects">
-                <img src="../assets/log.png" class="bounty-rune" v-if="isLeftLog">
-                <div style="width: 170.66px; height: 200px;" v-else>
-                </div>
-                <div style="display: flex; justify-content: center;">
-                    <img src="../assets/beaverLeft.png" v-if="isLeftBeaver" class="beaver-img">
-                    <img src="../assets/beaverRight.png" v-else class="beaver-img">
-                </div>
-                <img src="../assets/log.png" class="bounty-rune" v-if="isRightLog">
-                <div style="width: 170.66px; height: 200px;" v-else>
-                </div>
-            </div>
-            <div class="btn">
-                <game-button @click="toLeftBeaver" style="width: 200px">
-                    Влево
-                </game-button>
-                <game-button @click="toRightBeaver" style="width: 200px">
-                    Вправо
-                </game-button>
-            </div>
-        </div>
-        <div style="height: 100vh; display: flex; align-items: center;" v-else>
-            <div class="game-over">
-                <div> 
-                    Ваш результат: {{currScore}}
-                </div>
-                <router-link to="/" style="width: 300px; display: flex; justify-content: center; align-items: center;">
-                    <game-button>
+    <div class="game-container">
+        <h1>Нажмите клавишу!</h1>
+        <div v-if="currentDirection" class="key-prompt" :style="{ opacity: keyOpacity }">{{ currentDirection }}</div>
+        <div class="lives">Жизни: <span>{{ lives }}</span></div>
+
+        <!-- Модальное окно -->
+        <div v-if="isGameOver" class="modal">
+            <div class="modal-content">
+                <h2>Игра окончена!</h2>
+                <p>Вы потеряли все жизни.</p>
+                <game-button>
+                    <router-link to="/" class="link">
                         Назад
-                    </game-button>
-                </router-link>
+                    </router-link>
+                </game-button>
             </div>
         </div>
-        <img src="../assets/bg1.png" class="logs-img" v-if="currScore >= 2 && currScore < 4 && counter">
-        <img src="../assets/bg2.png" class="logs-img" v-if="currScore >= 4 && currScore < 6 && counter">
-        <img src="../assets/bg3.png" class="logs-img" v-if="currScore >= 6 && currScore < 8 && counter">
-        <img src="../assets/bg4.png" class="logs-img" v-if="currScore >= 8 && currScore < 10 && counter">
-        <img src="../assets/bg5.png" class="logs-img" v-if="currScore >= 10 && currScore < 12 && counter">
-        <img src="../assets/bg6.png" class="logs-img" v-if="currScore >= 12 && currScore < 14 && counter">
-        <img src="../assets/bg7.png" class="logs-img" v-if="currScore >= 14 && currScore < 16 && counter">
-        <img src="../assets/bg8.png" class="logs-img" v-if="currScore >= 16 && currScore < 18 && counter">
-        <img src="../assets/bg9.png" class="logs-img" v-if="currScore >= 18 && currScore < 20 && counter">
-        <img src="../assets/bg10.png" class="logs-img" v-if="currScore >= 20 && currScore < 22 && counter">
     </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue"
-import GameButton from "../components/GameButton.vue";
-import http from "../http_common";
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 
-export default defineComponent({
-    components: {
-        GameButton
-    },
+export default {
+    name: 'KeyboardGame',
+    setup() {
+        const lives = ref(3);
+        const currentDirection = ref<string | null>(null);
+        const gameSpeed = ref(1000);
+        const keyOpacity = ref(1);
+        const isGameOver = ref(false);
+        let keyTimeout: ReturnType<typeof setTimeout> | null = null;
 
-    data() {
+        const directions = [
+            { name: 'Вверх', keys: ['ArrowUp', 'KeyW', 'KeyЦ'] },
+            { name: 'Вниз', keys: ['ArrowDown', 'KeyS', 'KeyЫ'] },
+            { name: 'Влево', keys: ['ArrowLeft', 'KeyA', 'KeyФ'] },
+            { name: 'Вправо', keys: ['ArrowRight', 'KeyD', 'KeyВ'] },
+        ];
 
-        return {
-            currScore: 0,
-            counter: 20,
-            score: 0,
-            isLeftBeaver: true,
-            isRightBeaver: false,
-            isRightLog: true,
-            isLeftLog: false,
-            caught: false,
-            user: null,
-            userscore: 0,
-        }
-    },
-    methods:
-    {
-        increment() {
-            if (this.isRightBeaver && this.isRightLog && !this.caught) {
-                this.caught = true;
-                this.currScore++;
-            }
-            else {
-                if (this.isLeftBeaver && this.isLeftLog && !this.caught) {
-                    this.caught = true;
-                    this.currScore++;
+        const getRandomDirection = () => {
+            const randomIndex = Math.floor(Math.random() * directions.length);
+            return directions[randomIndex];
+        };
+
+        const showNextDirection = () => {
+            const direction = getRandomDirection();
+            currentDirection.value = direction.name;
+            keyOpacity.value = 1;
+
+            if (keyTimeout) clearTimeout(keyTimeout);
+            keyTimeout = setTimeout(() => {
+                keyOpacity.value = 0;
+            }, gameSpeed.value);
+        };
+
+        const handleKeyPress = (event: KeyboardEvent) => {
+            const pressedKey = event.code;
+            const currentKeys = directions.find(dir => dir.name === currentDirection.value)?.keys || [];
+            console.log(`Нажата клавиша: ${pressedKey}`);
+
+            if (currentKeys.includes(pressedKey)) {
+                gameSpeed.value = Math.max(200, gameSpeed.value - 50);
+                showNextDirection();
+            } else {
+                lives.value--;
+                if (lives.value <= 0) {
+                    isGameOver.value = true; // Устанавливаем состояние завершения игры
+                } else {
+                    showNextDirection();
                 }
             }
-        },
-        countDown() {
-            if (this.counter) {
-                return setTimeout(() => {
-                    --this.counter
-                    this.countDown()
-                }, 1000)
-            }
+        };
 
-            this.score = this.currScore;
-        },
-        toLeftBeaver() {
-            this.isRightBeaver = false;
-            this.isLeftBeaver = true;
-        },
-        toRightBeaver() {
-            this.isLeftBeaver = false;
-            this.isRightBeaver = true;
-        },
-        toLeftBounty() {
-            setTimeout(() => {
-                this.isLeftLog = true;
-                this.isRightLog = false;
-                this.caught = false;
-            }, 1000);
-        },
-        toRightBounty() {
-            setTimeout(() => {
-                this.isLeftLog = false;
-                this.isRightLog = true;
-                this.caught = false;
-            }, 1000);
-        },
-        bountyLoop() {
-            if (this.isRightLog) {
-                this.toLeftBounty();
-            }
-            else {
-                this.toRightBounty();
-            }
-        },
-        randomNum() {
-            var random = Math.random();
+        const resetGame = () => {
+            lives.value = 3;
+            gameSpeed.value = 1000;
+            isGameOver.value = false;
+            showNextDirection();
+        };
 
-            if (random < 0.34)
-                return 1;
+        onMounted(() => {
+            document.addEventListener('keydown', handleKeyPress);
+            resetGame();
+        });
 
-            return random;
-        },
-        handleSubmit() {
-            if (this.score > this.userscore) {
-                const response = http.put('/user/update/', {
-                    score: this.score
-                });
-            }
-        },
+        onBeforeUnmount(() => {
+            document.removeEventListener('keydown', handleKeyPress);
+            if (keyTimeout) clearTimeout(keyTimeout);
+        });
+
+        return {
+            lives,
+            currentDirection,
+            keyOpacity,
+            isGameOver,
+            showNextDirection,
+        };
     },
-    async mounted() {
-        this.countDown();
-        await http.get('/user/')
-            .then((response) => {
-                this.user = response.data;
-                this.userscore = response.data.score;
-                console.log(response)
-            })
-            .catch((e) => {
-                console.log(e)
-            })
-    },
-    beforeUpdate() {
-        this.increment();
-    },
-    updated() {
-        this.bountyLoop();
-    },
-})
+};
 </script>
 
-<style lang="css" scoped>
-.objects {
-    display: flex;
-    justify-content: space-evenly;
-    width: 70%;
-}
-
-.game-over {
+<style scoped>
+.game-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    color: #2f1e1e;
-    background-color: #b8cece;
-    border-radius: 5px;
-    font-size: 26px;
-    padding: 40px;
-    font-weight: 700;
-}
-
-.bounty-rune {
-    width: 20%;
-}
-
-.btn {
-    display: flex;
-    justify-content: space-evenly;
-    width: 50%;
-    margin-top: 30px;
-}
-
-.game {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    z-index: 2;
-    position: relative;
-}
-
-a {
-    text-decoration: none;
-}
-
-.beaver-img {
-    width: 50%;
-}
-
-.bg {
-    display: flex;
-    flex-direction: column;
+    justify-content: center;
     height: 100vh;
+    background-color: #282c34;
+    color: white;
+    font-family: Arial, sans-serif;
 }
 
-.logs-img {
-    width: 96%;
-    z-index: 1;
-    position: absolute;
+.key-prompt {
+    font-size: 48px;
+    margin: 20px;
+    transition: opacity 0.5s;
+}
+
+.lives {
+    font-size: 24px;
+}
+
+/* Стили для модального окна */
+.modal {
+    position: fixed;
+    top: 0;
     left: 0;
+    right: 0;
     bottom: 0;
-    transform: scale(1.08, 1);
+    background-color: rgba(0, 0, 0, 0.7); /* Полупрозрачный фон */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000; /* Убедитесь, что модальное окно поверх остальных элементов */
 }
 
-.header {
-    background-color: #060223;
-    font-size: 30px;
-    text-align: center;
+.modal-content {
+    background-color: white;
+    color: black;
     padding: 20px;
-    color: #7f9e9f;
-    font-weight: 700;
-    z-index: 2;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.timer {
-    font-size: 26px;
-    padding: 30px;
-    font-weight: 700;
+.modal-content h2 {
+    margin: 0 0 10px;
 }
 
-.score-info {
-    font-size: 22px;
-    font-size: 26px;
-    margin-bottom: 60px;
-    font-weight: 700;
+.modal-content p {
+    margin: 0 0 20px;
 }
 </style>

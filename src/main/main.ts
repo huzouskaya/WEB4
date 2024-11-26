@@ -1,5 +1,6 @@
 import {app, BrowserWindow, ipcMain, session} from 'electron';
-import {join} from 'path';
+import path, {join} from 'path';
+import { fork } from 'child_process';
 
 function createWindow () {
   const mainWindow = new BrowserWindow({
@@ -20,6 +21,8 @@ function createWindow () {
     mainWindow.loadFile(join(app.getAppPath(), 'renderer', 'index.html'));
   }
 }
+
+fork(path.join(__dirname, 'server.ts'));
 
 app.whenReady().then(() => {
   createWindow();
@@ -49,3 +52,5 @@ app.on('window-all-closed', function () {
 ipcMain.on('message', (event, message) => {
   console.log(message);
 })
+
+

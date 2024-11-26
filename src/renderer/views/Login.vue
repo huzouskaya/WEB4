@@ -50,10 +50,12 @@ export default {
                 });
 
                 const token = response.data.token;
+                const user = response.data.user;
 
                 if (token) {
                     localStorage.setItem('token', token);
                     this.isAuth = true;
+                    localStorage.setItem('user', JSON.stringify(user));
                     this.$router.push("/");
                 }
             } catch (error) {

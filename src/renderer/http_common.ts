@@ -1,9 +1,21 @@
 import axios from "axios";
 
-export default axios.create({
+const http = axios.create({
   baseURL: "http://localhost:8000/api/",
   headers: {
-    "Content-type": "application/json",
-    'Authorization': 'Bearer '+ localStorage.getItem('token')
+    "Content-type": "application/json"
   }
 });
+
+// // Добавление интерсептора для установки токена
+// http.interceptors.request.use(config => {
+//   const token = localStorage.getItem('token');
+//   if (token) {
+//     config.headers['Authorization'] = 'Bearer ' + token;
+//   }
+//   return config;
+// }, error => {
+//   return Promise.reject(error);
+// });
+
+export default http;
