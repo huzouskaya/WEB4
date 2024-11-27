@@ -9,9 +9,10 @@
             <div class="modal-content">
                 <h2>Игра окончена!</h2>
                 <p>Вы потеряли все жизни.</p>
+                <p>Количество правильных нажатий: {{ correctKeyPresses }}</p>
                 <game-button>
                     <router-link to="/" class="link">
-                        Назад
+                        назад в меню
                     </router-link>
                 </game-button>
             </div>
@@ -30,6 +31,7 @@ export default {
         const gameSpeed = ref(1000);
         const keyOpacity = ref(1);
         const isGameOver = ref(false);
+        const correctKeyPresses = ref(0);
         let keyTimeout: ReturnType<typeof setTimeout> | null = null;
 
         const directions = [
@@ -61,12 +63,13 @@ export default {
             console.log(`Нажата клавиша: ${pressedKey}`);
 
             if (currentKeys.includes(pressedKey)) {
+                correctKeyPresses.value++;
                 gameSpeed.value = Math.max(200, gameSpeed.value - 50);
                 showNextDirection();
             } else {
                 lives.value--;
                 if (lives.value <= 0) {
-                    isGameOver.value = true; // Устанавливаем состояние завершения игры
+                    isGameOver.value = true;
                 } else {
                     showNextDirection();
                 }
@@ -77,6 +80,7 @@ export default {
             lives.value = 3;
             gameSpeed.value = 1000;
             isGameOver.value = false;
+            correctKeyPresses.value = 0;
             showNextDirection();
         };
 
@@ -95,6 +99,7 @@ export default {
             currentDirection,
             keyOpacity,
             isGameOver,
+            correctKeyPresses,
             showNextDirection,
         };
     },
@@ -123,18 +128,17 @@ export default {
     font-size: 24px;
 }
 
-/* Стили для модального окна */
 .modal {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.7); /* Полупрозрачный фон */
+    background-color: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000; /* Убедитесь, что модальное окно поверх остальных элементов */
+    z-index: 1000;
 }
 
 .modal-content {
@@ -153,4 +157,9 @@ export default {
 .modal-content p {
     margin: 0 0 20px;
 }
+
+/* .modal-content router-link {
+    
+} */
+
 </style>
