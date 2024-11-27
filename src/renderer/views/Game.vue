@@ -11,7 +11,7 @@
                 <p>Вы потеряли все жизни.</p>
                 <p>Количество правильных нажатий: {{ correctKeyPresses }}</p>
                 <game-button>
-                    <router-link to="/" class="link">
+                    <router-link to="/" class="link" style="width: 300px; display: flex; justify-content: center; align-items: center;">
                         назад в меню
                     </router-link>
                 </game-button>
