@@ -477,19 +477,21 @@ if (started) {
   require$$3$1.app.quit();
 }
 const createWindow = () => {
-  const mainWindow = new require$$3$1.BrowserWindow({
+  const mainWindow2 = new require$$3$1.BrowserWindow({
     width: 800,
     height: 600,
+    icon: "/src/assets/img/favicon.ico",
     webPreferences: {
       preload: path$1.join(__dirname, "preload.js")
     }
   });
   {
-    mainWindow.loadURL("http://localhost:5173");
+    mainWindow2.loadURL("http://localhost:5173");
   }
 };
 require$$3$1.app.whenReady().then(() => {
   createWindow();
+  mainWindow.webContents.openDevTools();
   require$$3$1.app.on("activate", () => {
     if (require$$3$1.BrowserWindow.getAllWindows().length === 0) {
       createWindow();

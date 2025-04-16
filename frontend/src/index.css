@@ -1,13 +1,39 @@
 @import url('https://fonts.googleapis.com/css2?family=Jersey+10&family=Tiny5&display=swap');
 
-body {
-  background-image: url('./assets/bg.png');
+body.home {
+  background-image: url('./assets/img/nightsky.png');
   background-repeat: no-repeat;
   background-size: 100vw 100vh;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
-    Arial, sans-serif;
   margin: auto;
-  max-width: 38rem;
-  padding: 2rem;
+  /* max-width: 38rem;
+  padding: 2rem; */
+  font-family: 'Tiny5', sans-serif;
+}
+
+body.game {
+  font-family: 'Tiny5', sans-serif;
+  background-color: rgb(31, 11, 26);
+  background-image: none;
+  overflow: hidden;
+  background-image: none;
+}
+
+body.leaderboard {
+  background-image: url('./assets/img/nightsky.png');
+  background-repeat: no-repeat;
+  background-size: 100vw 100vh;
+  margin: auto;
+  /* max-width: 38rem; */
+  padding-left: 2rem;
+  font-family: 'Tiny5', sans-serif;
+}
+
+body.results {
+  background-image: url('./assets/img/nightsky.png');
+  background-repeat: no-repeat;
+  background-size: 100vw 100vh;
+  margin: auto;
+  /* max-width: 38rem; */
+  padding-left: 2rem;
   font-family: 'Tiny5', sans-serif;
 }

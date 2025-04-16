@@ -5,8 +5,8 @@
         </div>
         <form @submit.prevent="login">
             <div class="form">
-                <input v-model="username" type="text" placeholder="Username" required>
-                <input v-model="password" type="password" placeholder="Password" required id="password">
+                <input v-model="username" type="text" placeholder="Username" required @input="resetError">
+                <input v-model="password" type="password" placeholder="Password" required id="password" @input="resetError">
                 <div>
                     <!--check login and password-->
                     <game-button type="submit" class="enter">
@@ -17,9 +17,12 @@
                     <router-link to="/register">
                         <a class="reg">Don't Have An Account? Sign Up</a>
                     </router-link>
+                    <p v-if="error" style="color: rgb(204, 2, 180)">{{ error }}</p>
                 </div>
             </div>
         </form>
+        <img src="../assets/img/login girl.png" class="girl">
+        <img src="../assets/img/login speech.png" class="bubble">
         <router-link to="/">
             <div class="exit">
                 <game-button class="btn">
@@ -31,16 +34,43 @@
 </template>
 
 <script lang="ts">
-import axios from "axios"
+import { useAuthStore } from '../store/auth'
 import GameButton from "../components/GameButton.vue";
 
 export default {
     components: {
         GameButton
     },
-
-    
-
+    setup() {
+        const authStore = useAuthStore()
+        return {
+            authStore
+        }
+    },
+    data() {
+        return {
+            email: "",
+            password: "",
+            username: "",
+            error: ""
+        }
+    },
+    methods: {
+        async login() {
+            await this.authStore.login(this.email, this.password, this.username, this.$router)
+            if (!this.authStore.isAuthenticated) {
+                this.error = 'Please check your credentials.'
+            }
+            else {
+                setTimeout(() => {
+                        this.$router.push('/')
+                }, 1000);
+            }
+        },
+        resetError() {
+            this.error = ""
+        }
+    }
 };
 </script>
 
@@ -48,16 +78,19 @@ export default {
 .login-form {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: end;
     justify-content: center;
+    padding-right: 15%;
+    padding-top: 2%;
 }
 
 .header {
-    background-color: #010430b9;
-    font-size: 30px;
+    background-color: #f9a9ff7a;
+    font-size: 2.5em;
     text-align: center;
     padding: 20px;
-    color: #c7d4ff;
+    color: rgb(254, 1, 224);
+    text-shadow: rgba(70, 60, 71, 0.782) 0px 0px 11px;
     font-weight: 700;
     width: 265px;
     margin-top: 15vh;
@@ -67,7 +100,7 @@ export default {
 .form {
     display: flex;
     flex-direction: column;
-    background-color: #010430b9;
+    background-color: #f9a9ff7a;
     border-radius: 0px 0px 5px 5px;
     padding: 20px;
     align-items: center;
@@ -137,7 +170,7 @@ input:focus {
 
 .reg {
     font-style: italic;
-    color: #c7d4ff;
+    color: rgb(204, 2, 180);
 }
 
 .reg:hover {
@@ -167,5 +200,24 @@ a {
     position: absolute;
     bottom: 1.5em;
     right: 20px;
+}
+
+.girl {
+    height: 100%;
+    left:0%;
+    bottom:0%;
+    position:fixed;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.bubble {
+    height: 25%;
+    align-items: center;
+    top:2%;
+    left: 0%;
+    position:fixed;
+    pointer-events: none;
+    z-index: -1;
 }
 </style>

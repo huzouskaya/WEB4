@@ -15,20 +15,20 @@ export default {
 .btn {
     background: none;
     font-size: 20px;
-    color: #1d0072;
+    color: #ffa3dd;
     margin-top: 10px;
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    box-shadow: 0 8px 16px 0 rgba(242, 66, 255, 0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
     border: none;
     border-radius: 10px;
-    background: linear-gradient(0deg, rgba(252,0,255,1) 0%, rgba(21,0,255,1) 100%);;
+    background: linear-gradient(0deg, rgb(254, 104, 216) 0%, rgb(248, 44, 143) 80%);
     padding: 10px 25px;
     font-family: 'Tiny5', sans-serif;
     font-size: 26px;
     font-weight: 700;
 }
 .btn:hover {
-    background: linear-gradient(0deg, rgb(251, 31, 255) 0%, rgb(71, 55, 248) 100%);
-    color: #27009b;
+    background: linear-gradient(0deg, rgb(248, 146, 222) 0%, rgb(248, 98, 170) 80%);
+    color: #facdea;
     
 }
 

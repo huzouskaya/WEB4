@@ -7,12 +7,14 @@
             <div class="form">
                 <input v-model="username" type="text" placeholder="Username" required>
                 <input v-model="password" type="password" placeholder="Password" required id="password">
-                <input v-model="password" type="text" placeholder="E-mail" required id="password">
+                <input v-model="email" type="text" placeholder="E-mail" required id="email">
                 <div>
                     <!--check login and password-->
                     <game-button type="submit" class="enter">
                         SIGN UP
                     </game-button>
+                    <p v-if="error">{{ error }}</p>
+                    <p v-if="success">{{ success }}</p>
                 </div>
                 <div>
                     <router-link to="/login">
@@ -21,6 +23,8 @@
                 </div>
             </div>
         </form>
+        <img src="../assets/img/register girl.png" class="girl">
+        <img src="../assets/img/register speech.png" class="bubble">
         <router-link to="/">
             <div class="exit">
                 <game-button class="btn">
@@ -32,12 +36,52 @@
 </template>
 
 <script lang="ts">
+import { getCSRFToken } from '../store/auth'
 import GameButton from "../components/GameButton.vue";
 
 export default {
     components: {
         GameButton
     },
+    data() {
+        return {
+            email: '',
+            password: '',
+            username: '',
+            error: '',
+            success: ''
+        }
+    },
+    methods: {
+        async register() {
+            try {
+                const response = await fetch('http://localhost:8000/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCSRFToken()
+                    },
+                    body: JSON.stringify({
+                        email: this.email,
+                        password: this.password,
+                        username: this.username
+                    }),
+                    credentials: 'include'
+                })
+                const data = await response.json()
+                if (response.ok) {
+                    this.success = 'Registration successful! Please log in.'
+                    setTimeout(() => {
+                        this.$router.push('/login')
+                    }, 1000);
+                } else {
+                    this.error = data.error || 'Registration failed'
+                }
+            } catch (err) {
+                this.error = 'An error occurred during registration: ' + err
+            }
+        }
+    }
 
 };
 </script>
@@ -46,16 +90,19 @@ export default {
 .login-form {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items:end;
+    padding-right: 15%;
+    padding-top: 2%;
     justify-content: center;
 }
 
 .header {
-    background-color: #010430b9;
-    font-size: 30px;
+    background-color: #f9a9ff7a;
+    font-size: 2.5em;
     text-align: center;
     padding: 20px;
-    color: #c7d4ff;
+    color: rgb(254, 1, 224);
+    text-shadow: rgba(70, 60, 71, 0.782) 0px 0px 11px;
     font-weight: 700;
     width: 265px;
     margin-top: 10vh;
@@ -65,7 +112,7 @@ export default {
 .form {
     display: flex;
     flex-direction: column;
-    background-color: #010430b9;
+    background-color: #f9a9ff7a;
     border-radius: 0px 0px 5px 5px;
     padding: 20px;
     align-items: center;
@@ -135,7 +182,8 @@ input:focus {
 
 .log {
     font-style: italic;
-    color: #c7d4ff;
+    color: rgb(204, 2, 180);
+    font-size: 1em;
 }
 
 .reg:hover {
@@ -165,5 +213,24 @@ a {
     position: absolute;
     bottom: 1.5em;
     right: 20px;
+}
+
+.girl {
+    height: 100%;
+    left:0%;
+    bottom:0%;
+    position:fixed;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.bubble {
+    height: 25%;
+    align-items: center;
+    top:2%;
+    left: 0%;
+    position:fixed;
+    pointer-events: none;
+    z-index: -1;
 }
 </style>

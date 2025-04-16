@@ -5,5 +5,10 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.1"
+  },
+  "build": {
+    "win": {
+      "icon": "frontend/src/assets/img/favicon.ico"
+    }
   }
 }
