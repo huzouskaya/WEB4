@@ -1,0 +1,54 @@
+### Python ###
+# Virtual environment
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+.venv.bak/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django stuff
+*.log
+*.pot
+*.sqlite3
+db.sqlite3
+migrations/
+
+### Node ###
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+### Vite/Webpack ###
+dist/
+build/
+.cache/
+.temp/
+*.js.map
+*.css.map
+
+### IDE ###
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+### Environment ###
+.env
+.env.local
+.env.*
+!.env.example
+
+### System ###
+.DS_Store
+Thumbs.db

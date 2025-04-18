@@ -8,9 +8,11 @@ if (started) {
   app.quit();
 }
 
+let mainWindow; // Declare mainWindow in a broader scope
+
 const createWindow = () => {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({ // Assign to the broader scoped variable
     width: 800,
     height: 600,
     icon: '/src/assets/img/favicon.ico',
@@ -30,10 +32,19 @@ const createWindow = () => {
   //mainWindow.webContents.openDevTools();
 };
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
+const { session } = require('electron');
+
 app.whenReady().then(() => {
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Set-Cookie': [
+          'csrftoken=YOUR_TOKEN_HERE; Path=/; Secure; SameSite=Strict'
+        ]
+      }
+    });
+  });
   createWindow();
   mainWindow.webContents.openDevTools();
   // On OS X it's common to re-create a window in the app when the
